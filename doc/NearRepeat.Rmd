@@ -1,0 +1,140 @@
+---
+title: "NearRepeat: analyzing same repeat and near-repeat spatio-temporal point patterns using the Knox test"
+author: "Wouter Steenbeek"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to the NearRepeat package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The R package `NearRepeat` uses the Knox test for space-time clustering to quantify the spatio-temporal association between events. In criminology, this test has been used to identify people and locations that are at disproportionate risk of victimization during a certain time interval after a previous victimization. Of interest is often not only the 'repeat' victims (people or locations that after a first crime event, are targeted again within a short period thereafter), but also the 'near repeat' victims: nearby people or locations that are victimized within a short period after a previous crime against a nearby target.
+
+The package consists of one function: `NearRepeat()`. The functions uses the X and Y coordinates of points and a time that a crime happened at that location to determine the space-time clustering in the data using the Knox test using Monte Carlo simulation for approximating p-values.
+
+This vignette discusses `NearRepeat()`. See also `vignette("NearRepeat_breaks", package = "NearRepeat")` for more detailed information on specifying the intervals for the Knox test, and `vignette("NRC", package = "NearRepeat")` for a comparison to the often used [Near Repeat Calculator](http://www.cla.temple.edu/center-for-security-and-crime-science/projects/#near-repeat-calculator).
+
+
+## Open data
+
+```{r eval = FALSE}
+library(NearRepeat)
+```
+
+We will analyze residential burglary (breaking and entering) in Chicago. The data is drawn from the [Crime Open Database (CODE)](https://osf.io/zyaqn/), maintained by Matt Ashby. This source collates crime data from a number of open sources in a harmonized format. The data.frame `chicago_be` is a 2016 snapshot of offenses "residential burglary/breaking & entering" in Chicago. Details are provided in vignette `vignette("prepare_data", package = "NearRepeat")`.
+
+`X` and `Y` refer to spatial location, while `date` refers to the timing of the event. Let's select only the first month and take a peek.
+
+```{r}
+mydata <- chicago_be[which(chicago_be$date < "2016-02-01"), ]
+head(mydata)
+```
+
+
+## The Knox test
+
+In this vignette, I show a few basic examples of running the function `NearRepeat()` as well as plotting the results. See `?NearRepeat` for a description of all options. 
+
+A basic function call needs:
+
+- a vector of X coordinates (x)
+- a vector of Y coordinaates (y)
+- a vector of time when the events happened (time)
+- the break points of the spatial intervals of interest (sds)
+- the break points of the temporal intervals of interest (tds)
+
+By default, the 'manhattan' method is used to calculate spatial distances, and 999 Monte Carlo simulations are performed.
+
+Suppose one is interested in a Knox test analyzing 'repeat' (operationalized as a spatial interval between 0 and 0.1 meters) and then three spatial intervals of 200 meters each, and three temporal intervals of 7 days each (all other settings as default).
+
+We use `set.seed` to set a random seed (here 9489) for reproducibility, but this argument can be omitted if exact reproducibility is not necessary. 
+
+```{r results = "hide"}
+s_bands <- c(0, 0.1, 200, 400, 600)
+t_bands <- c(0, 7, 14, 21)
+
+set.seed(9489)
+result <- NearRepeat(x = mydata$X, y = mydata$Y, time = mydata$date, 
+                     sds = s_bands, tds = t_bands)
+```
+
+The `result` object is of class "knox", which is a list of 4 tables. These tables elements are called `observed`, `knox_ratio`, `knox_ratio_median` and `pvalues`. For each spatial and temporal distance combination, these show (1) the counts of observed crime pairs, (2) the Knox ratios based on the mean of the simulations, (3) the Knox ratios based on the median of the simulations, (4) p-values. If argument `saveSimulations = TRUE`, the object also includes a three-dimensional array called `array_Knox` with all simulated datasets.
+
+In the column and row headings, standard [interval notation](https://en.wikipedia.org/wiki/Interval_(mathematics)) is used to indicate whether break points of that interval are included or excluded from the interval.
+
+```{r}
+result
+```
+
+
+## Plotting the results
+
+By using the standard `plot()` function on a "knox" object, package `ggplot2` is used to create a heat hap of Near Repeat results.
+
+By default, the Knox ratios based on the mean across simulations are printed in the cells. The highlighting of the cells is based on a combination of the p-value and the size of the requested Knox ratio. Specifically, any Knox ratio with a significant p-value **and** at least 1.2 is highlighted (the increased occurrence of events in that spatio-temporal interval is at least 20% greater than what we would expect by chance).[^1]
+
+```{r, fig.width=4.5, fig.height=4}
+plot(result)
+```
+
+The default range of p-values that will be highlighted (0-0.05) can be adjusted using the 'pvalue_range' parameter.
+
+```{r, fig.width=4.5, fig.height=4, fig.show="hold"}
+plot(result, pvalue_range = c(0, .01))
+```
+
+The `minimum_perc` argument can be used to adjust the Knox ratio threshold (i.e. `minimum_perc = 50` means a Knox ratio larger than 1.5, rather than the default of 1.2).
+
+```{r, fig.width=4.5, fig.height=4, fig.show="hold"}
+plot(result, pvalue_range = c(0, .01), minimum_perc = 50)
+```
+
+The 'text' parameter (default = "knox_ratio") can also be used to print the observed values ("observed"), knox ratios based on the median across simulations ("knox_ratio_median"), p-values ("pvalues"), or no text (NA). For example, the p-values are:
+
+```{r, fig.width=4.5, fig.height=4, fig.show="hold"}
+plot(result, text = "pvalues")
+```
+
+Or the observed pairs of crime events:
+
+```{r, fig.width=4.5, fig.height=4, fig.show="hold"}
+plot(result, text = "observed")
+```
+
+Note that if `text` equals "pvalues", "observed", or is NA, highlighting is done based on p-values only.
+
+
+## Parallel processing
+
+Parallel processing is implemented using the [future](https://cran.r-project.org/package=future) framework, and specifically the function `future_lapply()` found in package `future.apply`. Parallel processing can significantly decrease computation time by distributing the Monte Carlo simulations across CPUs. This comes at the cost of overhead and setting up the parallel environment. Thus, for small tasks (as in this example), parallel processing is not worth the effort (i.e. it takes more time than sequential calculation). For larger tasks, parallel processing is recommended.
+
+Copying almost verbatim from the package creator [Henrik Bengtsson](https://www.jottr.org/2018/06/23/future.apply_1.0.0/): A fundamental design pattern of the future framework is that the end user decides *how and where* to parallelize while the developer decides *what* to parallelize. This means that you do not specify the backend via some argument to the function. Instead, the user specifies the backend by the `plan()` function of the future pckage. The function call to `NearRepeat()` remains exactly the same. That means by specyfing `plan()` first, you can run `NearRepeat()` in parallel on your *local machine*, and on *local or remote ad-hoc compute clusters* (also in the *cloud*).
+
+Also, reproducibility and sound (quasi-)random number generation is ensured by using the future framework. By default, `NearRepeat()` includes an argument `future.seed = TRUE` that ensures correct  behavior. "This will use parallel safe and statistical sound *L’Ecuyer-CMRG RNG*, which is a well-established parallel RNG algorithm and used by the parallel package. The future.apply functions use this in a way that is also invariant to the future backend and the amount of "chunking" used. To produce numerically reproducible results, for example set set.seed(123) before (as in the below example), or simply use future.seed = 123."[^2]
+
+```{r results = "hide"}
+# Not using parallel processing (the default)
+set.seed(123)
+result <- NearRepeat(x = mydata$X, y = mydata$Y, time = mydata$date, 
+                     sds = s_bands, tds = t_bands)
+
+# Parallel processing
+library(future)
+plan(multisession)
+set.seed(123)
+result <- NearRepeat(x = mydata$X, y = mydata$Y, time = mydata$date, 
+                     sds = s_bands, tds = t_bands)
+```
+
+
+[^1]: Near Repeat Calculator. Program manual for Version 1.3, p10. [PDF](https://liberalarts.temple.edu/sites/liberalarts/files/NearRepeatsManual.pdf)
+
+[^2]: [Henrik Bengtsson's blog](https://www.jottr.org/2018/06/23/future.apply_1.0.0/)

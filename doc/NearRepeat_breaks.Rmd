@@ -1,0 +1,156 @@
+---
+title: "NearRepeat: specifying intervals in detail"
+author: "Wouter Steenbeek"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Specifying intervals in NearRepeat()}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The R package `NearRepeat` uses the Knox test for space-time clustering to quantify the spatio-temporal association between events. In criminology, this test has been used to identify people and locations that are at disproportionate risk of victimization. Of interest is often not only the 'repeat' victims (people or locations that after a first crime event, are targeted again within a short period thereafter), but also the 'near repeat' victims: nearby people or locations that are victimized within a short period after the first crime.
+
+This vignette shows detailed examples of how spatial and temporal intervals are handled in `NearRepeat()`. See also `vignette("NearRepeat", package = "NearRepeat")` for an introduction vignette to `NearRepeat()`.
+
+## Create synthetic data
+
+Suppose we have the following spatio-temporal data (x and y refers to meters):
+
+```{r fig.height = 6, fig.width = 6}
+set.seed(10)
+mydata <- data.frame(x = sample(x = 20, size = 20, replace = TRUE) * 5,
+                     y = sample(x = 20, size = 20, replace = TRUE) * 5,
+                     time = sort(sample(20, size = 20, replace = TRUE)))
+mydata$date = as.Date(mydata$time, origin = "2018-01-01")
+
+head(mydata)
+
+# plot(mydata$x, mydata$y, type = "n", axes = FALSE, xlab = NA, ylab = NA)
+plot(mydata$x, mydata$y, pch = 0, cex = 2,
+     frame.plot = FALSE, xlab = "x", ylab = "y", xlim = c(0,100), ylim = c(0,100)) # , axes = FALSE, xlab = NA, ylab = NA)
+text(mydata$x, mydata$y, 1:nrow(mydata), cex = .7)
+```
+
+## Interval notation
+
+Suppose we are interested in a Knox test analyzing three near repeat spatial intervals of 20 meters each. Temporally, we are interested in 3 temporal intervals of 2 days each (so to a maximum of 6 days difference):
+
+```{r}
+library(NearRepeat)
+
+set.seed(123)
+myoutput <- NearRepeat(x = mydata$x, y = mydata$y,time = mydata$date,
+                       sds = c(0,20,40,60), tds = c(0,2,4,6))
+```
+
+With the other arguments at their defaults, this leads (e.g.) to the following observed pairs of events:
+
+```{r, fig.width=4.5, fig.height=4}
+plot(myoutput, text = "observed")
+```
+
+Standard [interval notation](https://en.wikipedia.org/wiki/Interval_(mathematics)) is used to indicate whether break points of that interval are included or excluded from the interval.
+
+As can be seen in the table, the spatial intervals run
+
+- from (and including) 0 to (and excluding) 20
+- from (and including) 20 to (and excluding) 40
+- from (and including) 40 to (and excluding) 60
+
+It is common to refer to these as "from 0 to 19", "from 20 to 39", and "from 40 to 59", but note that this is imprecise as the first spatial interval actually includes all distances up to 19.99999.... meters. When using `method = "manhattan"` (the default) this is impossible (as all distances will be integers), but such distances could happen with `method = "euclidean"`. Interval notation, i.e. [0,20) makes the interpretation unambiguous.
+
+## Requesting different interval breaks
+
+How the break points of the spatial and temporal intervals are handled are controlled by arguments `*_include.lowest` and `*_right`. For specifying spatial intervals, replace `*` by `s` and for temporal intervals by `t`. These arguments are the standard arguments of the function cut (see `?cut`):
+
+- `*_include.lowest`: Logical, indicating if a distance equal to the lowest (or highest, for right = FALSE) ‘breaks’ value should be included. (Default = FALSE)
+- `*_right`: Logical, indicating if the spatial intervals should be closed on the right (and open on the left) or vice versa. (Default = FALSE)
+
+
+## Discussion of the defaults (i.e. recommended settings)
+
+Any combination of `*_include.lowest` and `*_right` for both spatial and temporal intervals are possible, and the correct labels will always be displayed. The user is responsible for deciding whether these settings make sense for the particular problem at hand. Nevertheless, the default settings are `FALSE, FALSE`. A more detailed example shows why.
+
+In spatio-temporal criminology, researchers are often interested in separating 'same repeat' victimization, i.e. occuring at the exact same location, from 'near repeat' victimization, i.e. occuring elsehwere. Also, temporal intervals are often small, e.g. 1 day or 4 days or 7 days. For example the following function is called (our definition of 'same location' is 1 meter).
+
+### `*_include.lowest = FALSE`, `*_right = FALSE` (default)
+
+```{r}
+set.seed(123)
+ff <- NearRepeat(x = mydata$x, y = mydata$y, time = mydata$date,
+                 sds = c(0,1,20,40,60), tds = c(0,1,2,3,4),
+                 s_include.lowest = FALSE, s_right = FALSE, # the defaults
+                 t_include.lowest = FALSE, t_right = FALSE) # the defaults
+```
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(ff$observed)
+```
+
+These are the default settings. The intervals are left-closed, meaning the left-most break point is included in each interval. The intervals are right-open, meaning the right-most break point is excluded.
+
+The same repeat spatial interval includes 0 but excludes exactly 1 meter distances. The temporal intervals refer to "same day (0-0)", "1-1 day", "2-2 days", "3-3 days".
+
+### `*_include.lowest = FALSE`, `*_right = TRUE`
+
+```{r}
+set.seed(123)
+ft <- NearRepeat(x = mydata$x, y = mydata$y, time = mydata$date,
+                 sds = c(0,1,20,40,60), tds = c(0,1,2,3,4),
+                 s_include.lowest = FALSE, s_right = TRUE,
+                 t_include.lowest = FALSE, t_right = TRUE)
+```
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(ft$observed)
+```
+
+Now the the spatial intevals are left-open and right-closed.
+
+The same repeat spatial interval is incorrect, as it actually **excludes** crimes that are at the exact same locations (with 0 meter distance between them)! The temporal intervals refer to "1-1 day" difference (so near repeat on the exact same day is **excluded** completely), "2-2 days", "3-3 days", "4-4 days".
+
+This setting is not recommended.
+
+### `*_include.lowest = TRUE`, `*_right = FALSE`
+
+```{r}
+set.seed(123)
+tf <- NearRepeat(x = mydata$x, y = mydata$y, time = mydata$date,
+                 sds = c(0,1,20,40,60), tds = c(0,1,2,3,4),
+                 s_include.lowest = TRUE, s_right = FALSE,
+                 t_include.lowest = TRUE, t_right = FALSE)
+```
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(tf$observed)
+```
+
+The results look very similar as the default settings, **except** for the last intervals which are right-closed! This is strange especially for the temporal intervals, as they now read "0-0 days", "1-1 days", "2-2 days", "**3-4** days", i.e. the last temporal interval is larger than the others. (The same holds for the spatial intervals, but the effect is less noticeable because of the generally larger intervals).
+
+Because of the inconsistency regarding the final intervals, this settng is not recommended.
+
+
+### `*_include.lowest = TRUE`, `*_right = TRUE`
+
+```{r}
+set.seed(123)
+tt <- NearRepeat(x = mydata$x, y = mydata$y, time = mydata$date,
+                 sds = c(0,1,20,40,60), tds = c(0,1,2,3,4),
+                 s_include.lowest = TRUE, s_right = TRUE,
+                 t_include.lowest = TRUE, t_right = TRUE)
+```
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(tt$observed)
+```
+
+The spatial intervals are left-open and right-closed, **except** for the first interval which is left-closed. The spatial intervals are interpreted (imprecisely) as "0 to and including 1", "larger than 1 to and including 20", and so on. The temporal intervals are a bit awkward, as the first interval refers to the same day *and* 1 day difference, whereas the other intervals refer to single days: "**0-1** days", "2-2 days", "3-3 days", "4-4 days".
+
