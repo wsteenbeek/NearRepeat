@@ -8,6 +8,7 @@ Description: If a location is the target of a crime, then locations within a rel
     short distance are more likely to be targets of crime for a short period of time.
     This package uses the Knox test for space-time clustering to quantify the spatio-temporal 
     association between crime events, using simple inputs of coordinates and date.
+URL: https://github.com/wsteenbeek/NearRepeat
 Imports:
     parallel,
     future.apply (>= 1.3.0),
