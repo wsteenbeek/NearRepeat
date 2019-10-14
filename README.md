@@ -10,8 +10,8 @@ the ‘same repeat’ victims (people or locations that after a first crime
 event, are targeted again within a short period thereafter), but also
 the ‘near repeat’ victims: **nearby** people or locations that are
 victimized within a short period after the first crime. For more
-information, see the JDI Analysis Brief on
-<a href="http://www.ucl.ac.uk/jdibrief/analysis/repeat_victimisation" class="uri">http://www.ucl.ac.uk/jdibrief/analysis/repeat_victimisation</a>.
+information, see for example the [JDI Analysis
+Brief](http://www.ucl.ac.uk/jdibrief/analysis/repeat_victimisation).
 
 Note that in parallel with the development of the code here, Toby Davies
 has developed an alternative implementation in Python, which can be

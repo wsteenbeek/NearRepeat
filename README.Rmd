@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-The R package NearRepeat uses the Knox test for space-time clustering to quantify the spatio-temporal association between events. In criminology, this test has been used to identify people and locations that are at disproportionate risk of victimization. Of interest is often not only the 'same repeat' victims (people or locations that after a first crime event, are targeted again within a short period thereafter), but also the 'near repeat' victims: **nearby** people or locations that are victimized within a short period after the first crime. For more information, see the JDI Analysis Brief on http://www.ucl.ac.uk/jdibrief/analysis/repeat_victimisation.
+The R package NearRepeat uses the Knox test for space-time clustering to quantify the spatio-temporal association between events. In criminology, this test has been used to identify people and locations that are at disproportionate risk of victimization. Of interest is often not only the 'same repeat' victims (people or locations that after a first crime event, are targeted again within a short period thereafter), but also the 'near repeat' victims: **nearby** people or locations that are victimized within a short period after the first crime. For more information, see for example the [JDI Analysis Brief](http://www.ucl.ac.uk/jdibrief/analysis/repeat_victimisation).
 
 Note that in parallel with the development of the code here, Toby Davies has developed an alternative implementation in Python, which can be found [here](https://github.com/tobydavies/NearRepeat). We have collaborated on some of the accompanying materials and reviewed each other's code, and as far as we are aware the two implementations should give identical results.
 
