@@ -91,7 +91,9 @@ help("NearRepeat")
 Vignettes
 ---------
 
-You can view the available vignettes using:
+Vignettes are a long-form guide to an R package. Read these to get a
+relatively easy introduction to the package and its various options. You
+can view the available vignettes using:
 
 ``` r
 browseVignettes("NearRepeat")
@@ -103,9 +105,22 @@ To directly read the vignettes rather than going through
 ``` r
 vignette("NearRepeat", package = "NearRepeat")
 vignette("NearRepeat_breaks", package = "NearRepeat")
-vignette("prepare_data", package = "NearRepeat")
 vignette("NRC", package = "NearRepeat")
+vignette("prepare_data", package = "NearRepeat")
 ```
+
+Finally, the vignettes can be viewed directly, without installing the
+package, using the following links:
+
+-   [NearRepeat: introduction to the
+    package](http://htmlpreview.github.io/?https://github.com/wsteenbeek/NearRepeat/blob/master/doc/NearRepeat.html)
+-   [NearRepeat\_breaks: a detailed description of how bandwidths can be
+    specified](http://htmlpreview.github.io/?https://github.com/wsteenbeek/NearRepeat/blob/master/doc/NearRepeat_breaks.html)
+-   [NRC: a comparison to the Near Repeat
+    Calculator](http://htmlpreview.github.io/?https://github.com/wsteenbeek/NearRepeat/blob/master/doc/NRC.html)
+-   [prepare\_data: how data was downloaded and prepped for the examples
+    in the
+    vignettes](http://htmlpreview.github.io/?https://github.com/wsteenbeek/NearRepeat/blob/master/doc/prepare_data.html)
 
 License
 -------
