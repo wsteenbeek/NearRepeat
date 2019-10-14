@@ -28,14 +28,14 @@ NULL
 #'                           does c(0,100,200) refer to 0-100, 101-200? Or to 0-99 and 100-199?
 #'                           s_include.lowest follows the arguments of cut (see ?cut). Logical, indicating if a spatial
 #'                           distance equal to the lowest (or highest, for right = FALSE) ‘breaks’ value should be included.
-#'                           Default = FALSE. See vignette("nearrepeat_breaks") for details.
+#'                           Default = FALSE. See vignette("NearRepeat_breaks") for details.
 #' @param s_right            logical, indicating if the spatial intervals should be closed on the right (and open on
-#'                           the left) or vice versa. Default = FALSE. See vignette("nearrepeat_breaks") for details.
+#'                           the left) or vice versa. Default = FALSE. See vignette("NearRepeat_breaks") for details.
 #' @param t_include.lowest   t_include.lowest follows the arguments of cut (see ?cut). Logical, indicating if a temporal
 #'                           distance equal to the lowest (or highest, for right = FALSE) ‘breaks’ value should be included.
-#'                           Default = FALSE. See vignette("nearrepeat_breaks") for details.
+#'                           Default = FALSE. See vignette("NearRepeat_breaks") for details.
 #' @param t_right            logical, indicating if the temporal intervals should be closed on the right (and open on
-#'                           the left) or vice versa. Default = FALSE. See vignette("nearrepeat_breaks") for details.
+#'                           the left) or vice versa. Default = FALSE. See vignette("NearRepeat_breaks") for details.
 #' @param method             The method to calculate the spatial distances between crime events. Methods possible
 #'                           as in the 'dist' function (see ?dist). Default is 'manhattan', which seems to be a fair
 #'                           approximation of the distance travelled by a road network. Alternatively, the user can
