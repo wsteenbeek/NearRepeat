@@ -54,6 +54,14 @@ Then install the `NearRepeat` package using the `install_github` function in the
 devtools::install_github("wsteenbeek/NearRepeat", force = TRUE)
 ```
 
+Note that if you also want to view the vignettes directly within R, the command should read:
+
+```{r, eval = FALSE}
+devtools::install_github("wsteenbeek/NearRepeat", build_vignettes = TRUE, force = TRUE)
+```
+
+After a few moments you should see "creating vignettes ..." and at that point you have to wait a few minutes. Because of the wait time and because you may need additional packages to build vignettes, the default `install_github()` call does not build vignettes. Alternatively, the vignettes can also be viewed directly online (see section 'Vignettes').
+
 Package `NearRepeat` needs packages `future.apply` and `ggplot2` to function correctly. If these are not installed already, following the steps above should install these dependencies as well. If this doesn't happen, it's best to run `install.packages(c("future.apply", "ggplot2"))` and try the steps above again.
 
 
@@ -63,7 +71,7 @@ The package currently has one main function, also called `NearRepeat()`. See the
 
 ```{r, eval = FALSE, warning = FALSE, message = FALSE}
 library(NearRepeat)
-help("NearRepeat")
+?NearRepeat
 ```
 
 
