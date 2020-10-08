@@ -36,10 +36,6 @@ First, load the `NearRepeat` package.
 
 ```{r}
 library(NearRepeat)
-```
-
-```{r echo = FALSE}
-library(NearRepeat)
 mydata <- chicago_be[which(chicago_be$date < "2016-02-01"), ]
 ```
 

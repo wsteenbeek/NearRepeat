@@ -6,9 +6,6 @@ knitr::opts_chunk$set(
 
 ## -----------------------------------------------------------------------------
 library(NearRepeat)
-
-## ----echo = FALSE-------------------------------------------------------------
-library(NearRepeat)
 mydata <- chicago_be[which(chicago_be$date < "2016-02-01"), ]
 
 ## ---- echo = FALSE, results='asis'--------------------------------------------

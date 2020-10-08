@@ -337,7 +337,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h2>Application to test data</h2>
 <p>The inconsistency is demonstrated via application of the algorithms to the first month of the dataset <code>chicago_be</code> distilled from the Crime Open Database<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, which is already in the required format for the NRC (see <code>vignette(&quot;prepare_data&quot;, package = &quot;NearRepeat&quot;</code> for details). A .csv file of these data can be created by following the steps in vignette “prepare_data”.</p>
 <p>First, load the <code>NearRepeat</code> package.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(NearRepeat)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(NearRepeat)</span>
+<span id="cb1-2"><a href="#cb1-2"></a>mydata &lt;-<span class="st"> </span>chicago_be[<span class="kw">which</span>(chicago_be<span class="op">$</span>date <span class="op">&lt;</span><span class="st"> &quot;2016-02-01&quot;</span>), ]</span></code></pre></div>
 <p>The settings used when applying the NRC - chosen for no particular reason - are as follows:</p>
 <ul>
 <li>Spatial bandwidth: 100 metres</li>
