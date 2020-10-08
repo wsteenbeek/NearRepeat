@@ -82,11 +82,12 @@ because you may need additional packages to build vignettes, the default
 `install_github()` call does not build vignettes. Alternatively, the
 vignettes can also be viewed directly online (see section ‘Vignettes’).
 
-Package `NearRepeat` needs packages `future.apply` and `ggplot2` to
-function correctly. If these are not installed already, following the
-steps above should install these dependencies as well. If this doesn’t
-happen, it’s best to run `install.packages(c("future.apply",
-"ggplot2"))` and try the steps above again.
+Package `NearRepeat` needs packages `future.apply`, `progressr`, and
+`ggplot2` to function correctly. If these are not installed already,
+following the steps above should install these dependencies as well. If
+this doesn’t happen, it’s best to run
+`install.packages(c("future.apply", "progressr", "ggplot2"))` and try
+the steps above again.
 
 ## Example
 
