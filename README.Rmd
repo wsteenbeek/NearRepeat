@@ -1,7 +1,5 @@
 ---
-output:
-  md_document:
-    variant: markdown_github
+output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -34,30 +32,30 @@ Several other options exist but have drawbacks:
 
 The most recent version of the package is:
 
-> Steenbeek, W. (2018). *Near Repeat*. R package version 0.1.0. URL: https://github.com/wsteenbeek/NearRepeat
+> Steenbeek, W. (2018). *Near Repeat*. R package version 0.1.1. URL: https://github.com/wsteenbeek/NearRepeat
 
 
 ## Installation
 
 You can install the package from this 
 [GitHub repository](https://github.com/wsteenbeek/NearRepeat). You first need to
-install the [devtools](https://CRAN.R-project.org/package=devtools) package.
+install the [remotes](https://CRAN.R-project.org/package=remotes) package.
 
 ```{r, eval = FALSE}
-install.packages("devtools")
+install.packages("remotes")
 ```
 
 Then install the `NearRepeat` package using the `install_github` function in the
-[devtools](https://CRAN.R-project.org/package=devtools) package.
+[remotes](https://CRAN.R-project.org/package=remotes) package.
 
 ```{r, eval = FALSE}
-devtools::install_github("wsteenbeek/NearRepeat", force = TRUE)
+remotes::install_github("wsteenbeek/NearRepeat")
 ```
 
 Note that if you also want to view the vignettes directly within R, the command should read:
 
 ```{r, eval = FALSE}
-devtools::install_github("wsteenbeek/NearRepeat", build_vignettes = TRUE, force = TRUE)
+remotes::install_github("wsteenbeek/NearRepeat", build_vignettes = TRUE)
 ```
 
 After a few moments you should see "creating vignettes ..." and at that point you have to wait a few minutes. Because of the wait time and because you may need additional packages to build vignettes, the default `install_github()` call does not build vignettes. Alternatively, the vignettes can also be viewed directly online (see section 'Vignettes').

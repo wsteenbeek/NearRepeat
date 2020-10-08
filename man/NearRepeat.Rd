@@ -4,10 +4,22 @@
 \alias{NearRepeat}
 \title{Near Repeat calculator using the Knox test}
 \usage{
-NearRepeat(x, y, time, sds, tds, s_include.lowest = FALSE,
-  s_right = FALSE, t_include.lowest = FALSE, t_right = FALSE,
-  method = "manhattan", nrep = 999, saveSimulations = FALSE,
-  future.seed = TRUE, ...)
+NearRepeat(
+  x,
+  y,
+  time,
+  sds,
+  tds,
+  s_include.lowest = FALSE,
+  s_right = FALSE,
+  t_include.lowest = FALSE,
+  t_right = FALSE,
+  method = "manhattan",
+  nrep = 999,
+  saveSimulations = FALSE,
+  future.seed = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{a vector of x coordinates}
@@ -79,15 +91,18 @@ Use set.seed() before the function call to guarantee reproducibility. See helpfi
 set.seed(10)
 (mydata <- data.frame(x = sample(x = 20, size = 20, replace = TRUE) * 20,
                      y = sample(x = 20, size = 20, replace = TRUE) * 20,
-                     date = as.Date(sort(sample(20, size = 20, replace = TRUE)), origin = "2018-01-01")
+                     date = as.Date(sort(sample(20, size = 20, replace = TRUE)),
+                     origin = "2018-01-01")
                      ))
 
-# Near Repeat calculation using 0-100 meters and 100-Inf meters, and three temporal intervals of 2 days
+# Near Repeat calculation using 0-100 meters and 100-Inf meters, and three
+# temporal intervals of 2 days
 set.seed(38673)
 NearRepeat(x = mydata$x, y = mydata$y, time = mydata$date,
            sds = c(0,100,Inf), tds = c(0,2,4))
 
-# Add a 'same repeat' spatial interval of 0.001 meters, and use Euclidean distance
+# Add a 'same repeat' spatial interval of 0.001 meters, and use Euclidean
+# distance
 set.seed(38673)
 NearRepeat(x = mydata$x, y = mydata$y, time = mydata$date,
            sds = c(0,0.001,100,Inf), tds = c(0,2,4),
@@ -100,16 +115,18 @@ NearRepeat(x = mydata$x, y = mydata$y, time = mydata$date,
            method = "euclidean", nrep = 99)
 
 
-# The plot() function can be used to plot a Heat Map of Near Repeat results based on p-values
+# The plot() function can be used to plot a Heat Map of Near Repeat results
+# based on p-values
 set.seed(4622)
 myoutput <- NearRepeat(x = mydata$x, y = mydata$y, time = mydata$date,
                        sds = c(0,100,200,300,400), td = c(0,1,2,3,4,5))
 plot(myoutput)
 
-# The default range of p-values that will be highlighted (0-.05) can be adjusted using
-# the 'pvalue_range' parameter. By default the Knox ratios are printed in the cells,
-# but this can be adjusted using the 'text' parameter. The default is "knox_ratio".
-# Possible values are "observed", "knox_ratio", "knox_ratio_median", "pvalues", or NA.
+# The default range of p-values that will be highlighted (0-.05) can be
+# adjusted using the 'pvalue_range' parameter. By default the Knox ratios
+# are printed in the cells, but this can be adjusted using the 'text'
+# parameter. The default is "knox_ratio". Possible values are "observed",
+# "knox_ratio", "knox_ratio_median", "pvalues", or NA.
 
 # For more information, see vignette("NearRepeat")
 

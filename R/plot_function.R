@@ -20,7 +20,8 @@ NULL
 #' set.seed(10)
 #' (mydata <- data.frame(x = sample(x = 20, size = 20, replace = TRUE) * 20,
 #'                      y = sample(x = 20, size = 20, replace = TRUE) * 20,
-#'                      date = as.Date(sort(sample(20, size = 20, replace = TRUE)), origin = "2018-01-01")
+#'                      date = as.Date(sort(sample(20, size = 20, replace = TRUE)),
+#'                      origin = "2018-01-01")
 #'                      ))
 #'
 #' # The plot() function can be used to plot a Heat Map of Near Repeat results based on p-values

@@ -1,22 +1,25 @@
 Package: NearRepeat
 Type: Package
 Title: Near Repeat Calculation using the Knox Test (Monte Carlo permutation)
-Version: 0.1.0
-Authors@R: person("Wouter", "Steenbeek", role = c("aut", "cre"), email = "wsteenbeek@nscr.nl")
+Version: 0.1.1
+Authors@R: person("Wouter", "Steenbeek", role = c("aut", "cre", "cph"), email = "wsteenbeek@nscr.nl")
 Maintainer: Wouter Steenbeek <wsteenbeek@nscr.nl>
 Description: If a location is the target of a crime, then locations within a relatively 
     short distance are more likely to be targets of crime for a short period of time.
     This package uses the Knox test for space-time clustering to quantify the spatio-temporal 
     association between crime events, using simple inputs of coordinates and date.
 URL: https://github.com/wsteenbeek/NearRepeat
+Depends: 
+    R (>= 2.10)
 Imports:
     parallel,
     future.apply (>= 1.3.0),
-    ggplot2 (>= 3.0.0)
+    ggplot2 (>= 3.0.0),
+    progressr (>= 0.6.0)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

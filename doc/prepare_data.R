@@ -1,10 +1,10 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  # This block is not run as it takes a while to download, but code should
 #  # work on your computer
 #  
@@ -39,13 +39,13 @@ knitr::opts_chunk$set(
 #  
 #  chicago_df <- as.data.frame(chicago_sp@data)
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  chicago_df$dates <- paste(substr(as.character(chicago_df$date), 6, 7),
 #                            substr(as.character(chicago_df$date), 9, 10),
 #                            substr(as.character(chicago_df$date), 1, 4),
 #                            sep = "/")
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  # save as data.frame
 #  chicago_arson <- chicago_df[which(chicago_df$offense_type == "arson"), c("X", "Y", "date")]
 #  
@@ -68,7 +68,7 @@ knitr::opts_chunk$set(
 #              quote = FALSE,
 #              row.names = FALSE, col.names = FALSE)
 
-## ----echo = FALSE, eval = FALSE------------------------------------------
+## ----echo = FALSE, eval = FALSE-----------------------------------------------
 #  usethis::use_data(chicago_be, overwrite = TRUE)
 #  usethis::use_data(chicago_arson, overwrite = TRUE)
 

@@ -1,29 +1,44 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Wouter Steenbeek" />
 
-<meta name="date" content="2019-10-14" />
+<meta name="date" content="2020-10-08" />
 
 <title>NearRepeat: prepare data</title>
 
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
 
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -33,14 +48,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -49,9 +66,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -118,9 +135,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -289,7 +303,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -304,76 +319,76 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">NearRepeat: prepare data</h1>
 <h4 class="author">Wouter Steenbeek</h4>
-<h4 class="date">2019-10-14</h4>
+<h4 class="date">2020-10-08</h4>
 
 
 
 <p>In order to illustrate the application of the tools contained here, an example dataset is provided. This vignette shows some pre-processing steps to derive a dataset in suitable form for analysis.</p>
 <p>The data will be drawn from the <a href="https://osf.io/zyaqn/">Crime Open Database (CODE)</a>, maintained by Matt Ashby.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> This collates crime data from a number of open sources in a harmonized format. The spatial data is provided in lat/lon format; here the <code>sp</code> and <code>rgdal</code> libraries will be used to re-project the coordinates to metric units for distance calculations.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># This block is not run as it takes a while to download, but code should</span></a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="co"># work on your computer</span></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co"># Note: Because the data in the Crime Open Database can be suject to change, </span></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co"># running the code below *could* result in a different data.frame than used </span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co"># in this vignette. Therefore, the resulting datasets are included </span></a>
-<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co"># with the package NearRepeat. I.e., the below code need not be executed: </span></a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co"># after loading the package you can simply access the data object 'chicago_be'</span></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co"># and 'chicago_arson'.</span></a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="kw">library</span>(crimedata)</a>
-<a class="sourceLine" id="cb1-12" data-line-number="12">chicago_df &lt;-<span class="st"> </span><span class="kw">get_crime_data</span>(<span class="dt">years =</span> <span class="dv">2016</span>, <span class="dt">cities =</span> <span class="st">&quot;Chicago&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;core&quot;</span>)</a>
-<a class="sourceLine" id="cb1-13" data-line-number="13">chicago_df &lt;-<span class="st"> </span>chicago_df[<span class="kw">which</span>(chicago_df<span class="op">$</span>offense_type <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;residential burglary/breaking &amp; entering&quot;</span>, <span class="st">&quot;arson&quot;</span>)), ]</a>
-<a class="sourceLine" id="cb1-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="co"># convert to SpatialPointsDataFrame</span></a>
-<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="kw">library</span>(sp)</a>
-<a class="sourceLine" id="cb1-17" data-line-number="17"><span class="kw">library</span>(rgdal)</a>
-<a class="sourceLine" id="cb1-18" data-line-number="18">wgs84_CRS &lt;-<span class="st"> </span><span class="kw">CRS</span>(<span class="st">&quot;+init=epsg:4326&quot;</span>)</a>
-<a class="sourceLine" id="cb1-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb1-20" data-line-number="20">chicago_sp &lt;-<span class="st"> </span><span class="kw">SpatialPointsDataFrame</span>(<span class="dt">coords =</span> <span class="kw">cbind</span>(chicago_df<span class="op">$</span>longitude, chicago_df<span class="op">$</span>latitude),</a>
-<a class="sourceLine" id="cb1-21" data-line-number="21">                                     <span class="dt">data =</span> chicago_df[, <span class="kw">c</span>(<span class="st">&quot;uid&quot;</span>, <span class="st">&quot;date_single&quot;</span>, <span class="st">&quot;offense_type&quot;</span>)],</a>
-<a class="sourceLine" id="cb1-22" data-line-number="22">                                     <span class="dt">proj4string =</span> wgs84_CRS)</a>
-<a class="sourceLine" id="cb1-23" data-line-number="23"></a>
-<a class="sourceLine" id="cb1-24" data-line-number="24"><span class="co"># Re-project spatial data to EPSG:26971 projection (Illinois State Plane)</span></a>
-<a class="sourceLine" id="cb1-25" data-line-number="25">illinois_CRS &lt;-<span class="st"> </span><span class="kw">CRS</span>(<span class="st">&quot;+init=epsg:26971&quot;</span>)</a>
-<a class="sourceLine" id="cb1-26" data-line-number="26">chicago_sp &lt;-<span class="st"> </span><span class="kw">spTransform</span>(chicago_sp, illinois_CRS)</a>
-<a class="sourceLine" id="cb1-27" data-line-number="27"></a>
-<a class="sourceLine" id="cb1-28" data-line-number="28"><span class="co"># add X and Y variables, and date</span></a>
-<a class="sourceLine" id="cb1-29" data-line-number="29">chicago_sp<span class="op">$</span>X =<span class="st"> </span><span class="kw">coordinates</span>(chicago_sp)[,<span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb1-30" data-line-number="30">chicago_sp<span class="op">$</span>Y =<span class="st"> </span><span class="kw">coordinates</span>(chicago_sp)[,<span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb1-31" data-line-number="31">chicago_sp<span class="op">$</span>date &lt;-<span class="st"> </span><span class="kw">as.Date</span>(chicago_sp<span class="op">$</span>date_single)</a>
-<a class="sourceLine" id="cb1-32" data-line-number="32"></a>
-<a class="sourceLine" id="cb1-33" data-line-number="33">chicago_df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(chicago_sp<span class="op">@</span>data)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># This block is not run as it takes a while to download, but code should</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="co"># work on your computer</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co"># Note: Because the data in the Crime Open Database can be suject to change, </span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="co"># running the code below *could* result in a different data.frame than used </span></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="co"># in this vignette. Therefore, the resulting datasets are included </span></span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="co"># with the package NearRepeat. I.e., the below code need not be executed: </span></span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="co"># after loading the package you can simply access the data object &#39;chicago_be&#39;</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="co"># and &#39;chicago_arson&#39;.</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a></span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="kw">library</span>(crimedata)</span>
+<span id="cb1-12"><a href="#cb1-12"></a>chicago_df &lt;-<span class="st"> </span><span class="kw">get_crime_data</span>(<span class="dt">years =</span> <span class="dv">2016</span>, <span class="dt">cities =</span> <span class="st">&quot;Chicago&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;core&quot;</span>)</span>
+<span id="cb1-13"><a href="#cb1-13"></a>chicago_df &lt;-<span class="st"> </span>chicago_df[<span class="kw">which</span>(chicago_df<span class="op">$</span>offense_type <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;residential burglary/breaking &amp; entering&quot;</span>, <span class="st">&quot;arson&quot;</span>)), ]</span>
+<span id="cb1-14"><a href="#cb1-14"></a></span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="co"># convert to SpatialPointsDataFrame</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="kw">library</span>(sp)</span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="kw">library</span>(rgdal)</span>
+<span id="cb1-18"><a href="#cb1-18"></a>wgs84_CRS &lt;-<span class="st"> </span><span class="kw">CRS</span>(<span class="st">&quot;+init=epsg:4326&quot;</span>)</span>
+<span id="cb1-19"><a href="#cb1-19"></a></span>
+<span id="cb1-20"><a href="#cb1-20"></a>chicago_sp &lt;-<span class="st"> </span><span class="kw">SpatialPointsDataFrame</span>(<span class="dt">coords =</span> <span class="kw">cbind</span>(chicago_df<span class="op">$</span>longitude, chicago_df<span class="op">$</span>latitude),</span>
+<span id="cb1-21"><a href="#cb1-21"></a>                                     <span class="dt">data =</span> chicago_df[, <span class="kw">c</span>(<span class="st">&quot;uid&quot;</span>, <span class="st">&quot;date_single&quot;</span>, <span class="st">&quot;offense_type&quot;</span>)],</span>
+<span id="cb1-22"><a href="#cb1-22"></a>                                     <span class="dt">proj4string =</span> wgs84_CRS)</span>
+<span id="cb1-23"><a href="#cb1-23"></a></span>
+<span id="cb1-24"><a href="#cb1-24"></a><span class="co"># Re-project spatial data to EPSG:26971 projection (Illinois State Plane)</span></span>
+<span id="cb1-25"><a href="#cb1-25"></a>illinois_CRS &lt;-<span class="st"> </span><span class="kw">CRS</span>(<span class="st">&quot;+init=epsg:26971&quot;</span>)</span>
+<span id="cb1-26"><a href="#cb1-26"></a>chicago_sp &lt;-<span class="st"> </span><span class="kw">spTransform</span>(chicago_sp, illinois_CRS)</span>
+<span id="cb1-27"><a href="#cb1-27"></a></span>
+<span id="cb1-28"><a href="#cb1-28"></a><span class="co"># add X and Y variables, and date</span></span>
+<span id="cb1-29"><a href="#cb1-29"></a>chicago_sp<span class="op">$</span>X =<span class="st"> </span><span class="kw">coordinates</span>(chicago_sp)[,<span class="dv">1</span>]</span>
+<span id="cb1-30"><a href="#cb1-30"></a>chicago_sp<span class="op">$</span>Y =<span class="st"> </span><span class="kw">coordinates</span>(chicago_sp)[,<span class="dv">2</span>]</span>
+<span id="cb1-31"><a href="#cb1-31"></a>chicago_sp<span class="op">$</span>date &lt;-<span class="st"> </span><span class="kw">as.Date</span>(chicago_sp<span class="op">$</span>date_single)</span>
+<span id="cb1-32"><a href="#cb1-32"></a></span>
+<span id="cb1-33"><a href="#cb1-33"></a>chicago_df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(chicago_sp<span class="op">@</span>data)</span></code></pre></div>
 <p>To be sure that the NRC software accepts all values, a new <code>dates</code> column is added that uses the “mm/dd/yyyy” format:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">chicago_df<span class="op">$</span>dates &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="kw">substr</span>(<span class="kw">as.character</span>(chicago_df<span class="op">$</span>date), <span class="dv">6</span>, <span class="dv">7</span>),</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">                          <span class="kw">substr</span>(<span class="kw">as.character</span>(chicago_df<span class="op">$</span>date), <span class="dv">9</span>, <span class="dv">10</span>),</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">                          <span class="kw">substr</span>(<span class="kw">as.character</span>(chicago_df<span class="op">$</span>date), <span class="dv">1</span>, <span class="dv">4</span>),</a>
-<a class="sourceLine" id="cb2-4" data-line-number="4">                          <span class="dt">sep =</span> <span class="st">&quot;/&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>chicago_df<span class="op">$</span>dates &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="kw">substr</span>(<span class="kw">as.character</span>(chicago_df<span class="op">$</span>date), <span class="dv">6</span>, <span class="dv">7</span>),</span>
+<span id="cb2-2"><a href="#cb2-2"></a>                          <span class="kw">substr</span>(<span class="kw">as.character</span>(chicago_df<span class="op">$</span>date), <span class="dv">9</span>, <span class="dv">10</span>),</span>
+<span id="cb2-3"><a href="#cb2-3"></a>                          <span class="kw">substr</span>(<span class="kw">as.character</span>(chicago_df<span class="op">$</span>date), <span class="dv">1</span>, <span class="dv">4</span>),</span>
+<span id="cb2-4"><a href="#cb2-4"></a>                          <span class="dt">sep =</span> <span class="st">&quot;/&quot;</span>)</span></code></pre></div>
 <p>The data.frame is split up into residential burglary (breaking &amp; entering) and arson, and saves as .csv files.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># save as data.frame</span></a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">chicago_arson &lt;-<span class="st"> </span>chicago_df[<span class="kw">which</span>(chicago_df<span class="op">$</span>offense_type <span class="op">==</span><span class="st"> &quot;arson&quot;</span>), <span class="kw">c</span>(<span class="st">&quot;X&quot;</span>, <span class="st">&quot;Y&quot;</span>, <span class="st">&quot;date&quot;</span>)]</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co"># save as data.frame</span></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5">chicago_be &lt;-<span class="st"> </span>chicago_df[<span class="kw">which</span>(chicago_df<span class="op">$</span>offense_type <span class="op">==</span><span class="st"> &quot;residential burglary/breaking &amp; entering&quot;</span>), <span class="kw">c</span>(<span class="st">&quot;X&quot;</span>, <span class="st">&quot;Y&quot;</span>, <span class="st">&quot;date&quot;</span>)]</a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co"># Select first month of data, and save as .csv file</span></a>
-<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co"># Adjust file name (and include path) accordingly</span></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9">chicago_be_month1 &lt;-<span class="st"> </span>chicago_be[<span class="kw">which</span>(chicago_be<span class="op">$</span>date <span class="op">&lt;</span><span class="st"> &quot;2016-02-01&quot;</span>), ]</a>
-<a class="sourceLine" id="cb3-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="kw">write.table</span>(chicago_be_month1,</a>
-<a class="sourceLine" id="cb3-12" data-line-number="12">            <span class="dt">file =</span> <span class="st">&quot;inst/extdata/chicago_be_month1.csv&quot;</span>,</a>
-<a class="sourceLine" id="cb3-13" data-line-number="13">            <span class="dt">sep =</span> <span class="st">&quot;,&quot;</span>,</a>
-<a class="sourceLine" id="cb3-14" data-line-number="14">            <span class="dt">quote =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb3-15" data-line-number="15">            <span class="dt">row.names =</span> <span class="ot">FALSE</span>, <span class="dt">col.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb3-16" data-line-number="16"></a>
-<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="kw">write.table</span>(chicago_arson,</a>
-<a class="sourceLine" id="cb3-18" data-line-number="18">            <span class="dt">file =</span> <span class="st">&quot;inst/extdata/chicago_arson.csv&quot;</span>,</a>
-<a class="sourceLine" id="cb3-19" data-line-number="19">            <span class="dt">sep =</span> <span class="st">&quot;,&quot;</span>,</a>
-<a class="sourceLine" id="cb3-20" data-line-number="20">            <span class="dt">quote =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb3-21" data-line-number="21">            <span class="dt">row.names =</span> <span class="ot">FALSE</span>, <span class="dt">col.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># save as data.frame</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>chicago_arson &lt;-<span class="st"> </span>chicago_df[<span class="kw">which</span>(chicago_df<span class="op">$</span>offense_type <span class="op">==</span><span class="st"> &quot;arson&quot;</span>), <span class="kw">c</span>(<span class="st">&quot;X&quot;</span>, <span class="st">&quot;Y&quot;</span>, <span class="st">&quot;date&quot;</span>)]</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co"># save as data.frame</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>chicago_be &lt;-<span class="st"> </span>chicago_df[<span class="kw">which</span>(chicago_df<span class="op">$</span>offense_type <span class="op">==</span><span class="st"> &quot;residential burglary/breaking &amp; entering&quot;</span>), <span class="kw">c</span>(<span class="st">&quot;X&quot;</span>, <span class="st">&quot;Y&quot;</span>, <span class="st">&quot;date&quot;</span>)]</span>
+<span id="cb3-6"><a href="#cb3-6"></a></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co"># Select first month of data, and save as .csv file</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co"># Adjust file name (and include path) accordingly</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a>chicago_be_month1 &lt;-<span class="st"> </span>chicago_be[<span class="kw">which</span>(chicago_be<span class="op">$</span>date <span class="op">&lt;</span><span class="st"> &quot;2016-02-01&quot;</span>), ]</span>
+<span id="cb3-10"><a href="#cb3-10"></a></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="kw">write.table</span>(chicago_be_month1,</span>
+<span id="cb3-12"><a href="#cb3-12"></a>            <span class="dt">file =</span> <span class="st">&quot;inst/extdata/chicago_be_month1.csv&quot;</span>,</span>
+<span id="cb3-13"><a href="#cb3-13"></a>            <span class="dt">sep =</span> <span class="st">&quot;,&quot;</span>,</span>
+<span id="cb3-14"><a href="#cb3-14"></a>            <span class="dt">quote =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb3-15"><a href="#cb3-15"></a>            <span class="dt">row.names =</span> <span class="ot">FALSE</span>, <span class="dt">col.names =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb3-16"><a href="#cb3-16"></a></span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="kw">write.table</span>(chicago_arson,</span>
+<span id="cb3-18"><a href="#cb3-18"></a>            <span class="dt">file =</span> <span class="st">&quot;inst/extdata/chicago_arson.csv&quot;</span>,</span>
+<span id="cb3-19"><a href="#cb3-19"></a>            <span class="dt">sep =</span> <span class="st">&quot;,&quot;</span>,</span>
+<span id="cb3-20"><a href="#cb3-20"></a>            <span class="dt">quote =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb3-21"><a href="#cb3-21"></a>            <span class="dt">row.names =</span> <span class="ot">FALSE</span>, <span class="dt">col.names =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>Ashby, M.P.J. (2018). Crime Open Database (CODE). doi: <a href="https://doi.org/10.17605/OSF.IO/ZYAQN">10.17605/OSF.IO/ZYAQN</a><a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn1"><p>Ashby, M.P.J. (2018). Crime Open Database (CODE). doi: <a href="https://doi.org/10.17605/OSF.IO/ZYAQN">10.17605/OSF.IO/ZYAQN</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 

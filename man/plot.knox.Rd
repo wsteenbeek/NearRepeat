@@ -4,8 +4,12 @@
 \alias{plot.knox}
 \title{Plots a Heat Map of Near Repeat results based on p-values}
 \usage{
-\method{plot}{knox}(knox_object, pvalue_range = c(0, 0.05),
-  text = "knox_ratio", minimum_perc = 20)
+\method{plot}{knox}(
+  knox_object,
+  pvalue_range = c(0, 0.05),
+  text = "knox_ratio",
+  minimum_perc = 20
+)
 }
 \arguments{
 \item{knox_object}{a knox object, i.e. the result of a 'NearRepeat()' funtion call}
@@ -34,7 +38,8 @@ Plots a Heat Map of Near Repeat results based on p-values
 set.seed(10)
 (mydata <- data.frame(x = sample(x = 20, size = 20, replace = TRUE) * 20,
                      y = sample(x = 20, size = 20, replace = TRUE) * 20,
-                     date = as.Date(sort(sample(20, size = 20, replace = TRUE)), origin = "2018-01-01")
+                     date = as.Date(sort(sample(20, size = 20, replace = TRUE)),
+                     origin = "2018-01-01")
                      ))
 
 # The plot() function can be used to plot a Heat Map of Near Repeat results based on p-values

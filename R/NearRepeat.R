@@ -1,4 +1,5 @@
 #' @import future.apply
+#' @import progressr
 NULL
 
 #' Near Repeat calculator using the Knox test
@@ -54,15 +55,18 @@ NULL
 #' set.seed(10)
 #' (mydata <- data.frame(x = sample(x = 20, size = 20, replace = TRUE) * 20,
 #'                      y = sample(x = 20, size = 20, replace = TRUE) * 20,
-#'                      date = as.Date(sort(sample(20, size = 20, replace = TRUE)), origin = "2018-01-01")
+#'                      date = as.Date(sort(sample(20, size = 20, replace = TRUE)),
+#'                      origin = "2018-01-01")
 #'                      ))
 #'
-#' # Near Repeat calculation using 0-100 meters and 100-Inf meters, and three temporal intervals of 2 days
+#' # Near Repeat calculation using 0-100 meters and 100-Inf meters, and three
+#' # temporal intervals of 2 days
 #' set.seed(38673)
 #' NearRepeat(x = mydata$x, y = mydata$y, time = mydata$date,
 #'            sds = c(0,100,Inf), tds = c(0,2,4))
 #'
-#' # Add a 'same repeat' spatial interval of 0.001 meters, and use Euclidean distance
+#' # Add a 'same repeat' spatial interval of 0.001 meters, and use Euclidean
+#' # distance
 #' set.seed(38673)
 #' NearRepeat(x = mydata$x, y = mydata$y, time = mydata$date,
 #'            sds = c(0,0.001,100,Inf), tds = c(0,2,4),
@@ -75,16 +79,18 @@ NULL
 #'            method = "euclidean", nrep = 99)
 #'
 #'
-#' # The plot() function can be used to plot a Heat Map of Near Repeat results based on p-values
+#' # The plot() function can be used to plot a Heat Map of Near Repeat results
+#' # based on p-values
 #' set.seed(4622)
 #' myoutput <- NearRepeat(x = mydata$x, y = mydata$y, time = mydata$date,
 #'                        sds = c(0,100,200,300,400), td = c(0,1,2,3,4,5))
 #' plot(myoutput)
 #'
-#' # The default range of p-values that will be highlighted (0-.05) can be adjusted using
-#' # the 'pvalue_range' parameter. By default the Knox ratios are printed in the cells,
-#' # but this can be adjusted using the 'text' parameter. The default is "knox_ratio".
-#' # Possible values are "observed", "knox_ratio", "knox_ratio_median", "pvalues", or NA.
+#' # The default range of p-values that will be highlighted (0-.05) can be
+#' # adjusted using the 'pvalue_range' parameter. By default the Knox ratios
+#' # are printed in the cells, but this can be adjusted using the 'text'
+#' # parameter. The default is "knox_ratio". Possible values are "observed",
+#' # "knox_ratio", "knox_ratio_median", "pvalues", or NA.
 #'
 #' # For more information, see vignette("NearRepeat")
 #'
@@ -113,19 +119,19 @@ NearRepeat <- function(x, y, time,
   mydf <- data.frame(x = x, y = y, time = time)
 
   # Missing data?
-  if (sum(!complete.cases(mydf)) > 0){
+  if (sum(!stats::complete.cases(mydf)) > 0){
     # Print information on deleted cases
-    print(paste0(sum(!complete.cases(mydf))," events are removed due to missing x or y or time"))
+    print(paste0(sum(!stats::complete.cases(mydf))," events are removed due to missing x or y or time"))
     # Remove missing cases
-    mydf <- mydf[complete.cases(mydf),]
+    mydf <- mydf[stats::complete.cases(mydf),]
   }
 
   # Create xy matrix
   xy <- cbind(mydf$x, mydf$y)
 
   # Distances of the observed space-time pairs
-  s_dist <- dist(xy, method = method)
-  t_dist <- dist(mydf$time)
+  s_dist <- stats::dist(xy, method = method)
+  t_dist <- stats::dist(mydf$time)
 
   # Observed space-time pairs
   observed <- table(cut(s_dist, sds, include.lowest = s_include.lowest, right = s_right, dig.lab = 10),
@@ -141,11 +147,17 @@ NearRepeat <- function(x, y, time,
   spat_cut <- cut(s_dist, sds, include.lowest = s_include.lowest, right = s_right, dig.lab = 10)
 
   #### Run permutations, calculate pairs, and save to list
-  mylist <- future_lapply(seq_len(nrep), function(i){
-    t_dist_perm <- dist(sample(mydf$time))
-    return(table(spat_cut,
-                 cut(t_dist_perm, tds, include.lowest = t_include.lowest, right = t_right, dig.lab = 10)))
-  }, future.seed = future.seed, ...)
+  progressr::handlers("progress")
+  progressr::with_progress({
+    p <- progressr::progressor(along = seq_len(nrep))
+    mylist <- future_lapply(seq_len(nrep), function(i) {
+      p()
+      t_dist_perm <- stats::dist(sample(mydf$time))
+      return(table(spat_cut, cut(t_dist_perm, tds, include.lowest = t_include.lowest,
+                                 right = t_right, dig.lab = 10)))
+    }, future.seed = future.seed, ...)
+  })
+
 
   # Create 3-dimensional output array
   array_Knox <- array(data = as.numeric(unlist(mylist)), dim = c(dim(observed), nrep))

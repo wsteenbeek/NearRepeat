@@ -1,6 +1,7 @@
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-Overview
---------
+
+## Overview
 
 The R package NearRepeat uses the Knox test for space-time clustering to
 quantify the spatio-temporal association between events. In criminology,
@@ -22,7 +23,7 @@ give identical results.
 
 Several other options exist but have drawbacks:
 
--   [Prof. Jerry Ratcliffe’s](http://www.jratcliffe.net/software/) /
+  - [Prof. Jerry Ratcliffe’s](http://www.jratcliffe.net/software/) /
     [Temple
     University’s](http://www.cla.temple.edu/center-for-security-and-crime-science/projects/#near-repeat-calculator)
     Near Repeat calculator only works on Windows (and needs admin rights
@@ -30,51 +31,49 @@ Several other options exist but have drawbacks:
     rows and columns of its output files, which may lead to erroneous
     conclusions.
 
--   the free [JDI Near Repeat
+  - the free [JDI Near Repeat
     Toolkit](http://www.ucl.ac.uk/jill-dando-institute/research/research-groups/geo-crime/near_repeat_toolkit)
     also only works on Windows. However it is not actively supported and
     does not run on Windows 10.
 
--   the R package
+  - the R package
     [surveillance](https://cran.r-project.org/package=surveillance) has
     implemented the `knox()` function, but this only works for a single
     spatial distance and temporal distance, whereas the current package
     also works with multiple bands of spatial and temporal distances, as
     well as same repeat analysis.
 
-Version
--------
+## Version
 
 The most recent version of the package is:
 
-> Steenbeek, W. (2018). *Near Repeat*. R package version 0.1.0. URL:
-> <a href="https://github.com/wsteenbeek/NearRepeat" class="uri">https://github.com/wsteenbeek/NearRepeat</a>
+> Steenbeek, W. (2018). *Near Repeat*. R package version 0.1.1. URL:
+> <https://github.com/wsteenbeek/NearRepeat>
 
-Installation
-------------
+## Installation
 
 You can install the package from this [GitHub
 repository](https://github.com/wsteenbeek/NearRepeat). You first need to
-install the [devtools](https://CRAN.R-project.org/package=devtools)
+install the [remotes](https://CRAN.R-project.org/package=remotes)
 package.
 
 ``` r
-install.packages("devtools")
+install.packages("remotes")
 ```
 
 Then install the `NearRepeat` package using the `install_github`
-function in the [devtools](https://CRAN.R-project.org/package=devtools)
+function in the [remotes](https://CRAN.R-project.org/package=remotes)
 package.
 
 ``` r
-devtools::install_github("wsteenbeek/NearRepeat", force = TRUE)
+remotes::install_github("wsteenbeek/NearRepeat")
 ```
 
 Note that if you also want to view the vignettes directly within R, the
 command should read:
 
 ``` r
-devtools::install_github("wsteenbeek/NearRepeat", build_vignettes = TRUE, force = TRUE)
+remotes::install_github("wsteenbeek/NearRepeat", build_vignettes = TRUE)
 ```
 
 After a few moments you should see “creating vignettes …” and at that
@@ -86,12 +85,10 @@ vignettes can also be viewed directly online (see section ‘Vignettes’).
 Package `NearRepeat` needs packages `future.apply` and `ggplot2` to
 function correctly. If these are not installed already, following the
 steps above should install these dependencies as well. If this doesn’t
-happen, it’s best to run
-`install.packages(c("future.apply", "ggplot2"))` and try the steps above
-again.
+happen, it’s best to run `install.packages(c("future.apply",
+"ggplot2"))` and try the steps above again.
 
-Example
--------
+## Example
 
 The package currently has one main function, also called `NearRepeat()`.
 See the helpfile to see examples of the function in action:
@@ -101,8 +98,7 @@ library(NearRepeat)
 ?NearRepeat
 ```
 
-Vignettes
----------
+## Vignettes
 
 Vignettes are a long-form guide to an R package. Read these to get a
 relatively easy introduction to the package and its various options. You
@@ -125,18 +121,17 @@ vignette("prepare_data", package = "NearRepeat")
 Finally, the vignettes can be viewed directly, without installing the
 package, using the following links:
 
--   [NearRepeat: introduction to the
+  - [NearRepeat: introduction to the
     package](http://htmlpreview.github.io/?https://github.com/wsteenbeek/NearRepeat/blob/master/doc/NearRepeat.html)
--   [NearRepeat\_breaks: a detailed description of how bandwidths can be
+  - [NearRepeat\_breaks: a detailed description of how bandwidths can be
     specified](http://htmlpreview.github.io/?https://github.com/wsteenbeek/NearRepeat/blob/master/doc/NearRepeat_breaks.html)
--   [NRC: a comparison to the Near Repeat
+  - [NRC: a comparison to the Near Repeat
     Calculator](http://htmlpreview.github.io/?https://github.com/wsteenbeek/NearRepeat/blob/master/doc/NRC.html)
--   [prepare\_data: how data was downloaded and prepped for the examples
+  - [prepare\_data: how data was downloaded and prepped for the examples
     in the
     vignettes](http://htmlpreview.github.io/?https://github.com/wsteenbeek/NearRepeat/blob/master/doc/prepare_data.html)
 
-License
--------
+## License
 
 This package is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License, version 3, as
@@ -148,4 +143,4 @@ merchantability or fitness for a particular purpose. See the GNU General
 Public License for more details.
 
 A copy of the GNU General Public License, version 3, is available at
-<a href="https://www.r-project.org/Licenses/GPL-3" class="uri">https://www.r-project.org/Licenses/GPL-3</a>
+<https://www.r-project.org/Licenses/GPL-3>
