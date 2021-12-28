@@ -116,7 +116,7 @@ tidy_near_repeat <- function (
 
   # Find date column automatically if not specified
   if (isFALSE(columns$time)) {
-    date_cols <- which(unlist(lapply(data, inherits, "Date")))
+    date_cols <- which(unlist(lapply(data, rlang::inherits_any, c("Date", "POSIXt"))))
     if (length(date_cols) > 1) {
       stop(
         "More than one column in the `data` data frame contains date values. ",
@@ -134,7 +134,7 @@ tidy_near_repeat <- function (
   }
 
   # Check if date column contains dates
-  if (!inherits(data[[columns$time]], "Date"))
+  if (!rlang::inherits_any(data[[columns$time]], c("Date", "POSIXt")))
     stop(
       "The `", columns$time, "` column in the `data` data frame does not ",
       "contain date values. Please specify which date column should be used ",
