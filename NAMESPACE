@@ -2,6 +2,7 @@
 
 S3method(plot,knox)
 export(NearRepeat)
+export(tidy_near_repeat)
 import(future.apply)
 import(ggplot2)
 import(progressr)
